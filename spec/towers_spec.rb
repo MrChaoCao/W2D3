@@ -2,26 +2,17 @@ require 'rspec'
 require 'towers'
 
 class TowersOfHanoi
+
+  describe '#initialize' do
+    subject(:game) { TowersOfHanoi.new([[3, 2, 1], [], []]) }
+    it "starts games with the towers passed in" do
+      expect(game.towers).to eq([[3, 2, 1], [], []])
+    end
+  end
+
   describe '#move' do
     subject(:game) { TowersOfHanoi.new([[3, 2, 1], [], []]) }
-
-    it "won't move a disc onto a smaller disc" do
-      game.move([0, 1])
-      game.move([0, 1])
-      expect(game.towers).to eq([[3, 2], [1], []])
-    end
-
-    it "won't move a disc from an empty tower" do
-      game.move([1, 2])
-      expect(game.towers).to eq([[3, 2, 1], [], []])
-    end
-
-    it "won't move to a tower that doesn't exist" do
-      game.move([0, 4])
-      expect(game.towers).to eq([[3, 2, 1], [], []])
-    end
-
-    it "makes valid moves" do
+    it "makes moves discs between towers" do
       game.move([0, 1])
       expect(game.towers).to eq([[3, 2], [1], []])
     end
@@ -29,17 +20,36 @@ class TowersOfHanoi
 
 
   describe '#won?' do
-    let(:gamedub) { double("gamedub", :towers => [[], [3, 2, 1]]) }
-    it "knows when tower one or two is full" do
-      expect(gamedub.won?).to eq(true)
+    # let(:gamedub) { double("gamedub", :towers => [[], [], [3, 2, 1]]) }
+    subject(:game) { TowersOfHanoi.new([[3, 2, 1], [], []]) }
+    it "knows when the game is in progress" do
+      expect(game.won?).to be false
     end
 
-    context 'when game is not won, won?' do
-      let(:gamedub) { double("gamedub", :towers => [[3, 2, 1], []]) }
+    context 'it knows when the game has been won' do
+      let(:game) { TowersOfHanoi.new([[], [3, 2, 1], []]) }
       it "won? returns false" do
-        expect(game.won?).to eq(false)
+        expect(game.won?).to be true
       end
     end
   end
 
+  describe '#valid_move?' do
+    subject(:game) { TowersOfHanoi.new([[3, 2], [1], []]) }
+    it "won't move a disc onto a smaller disc" do
+      expect(game.valid_move?([0,1])).to be false
+    end
+
+    it "won't move a disc from an empty tower" do
+      expect(game.valid_move?([2,2])).to be false
+    end
+
+    it "won't move to a tower that doesn't exist" do
+      expect(game.valid_move?([0, 4])).to be false
+    end
+
+    it "recognizes valid moves" do
+      expect(game.valid_move?([0,2])).to be true
+    end
+  end
 end
